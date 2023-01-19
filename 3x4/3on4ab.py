@@ -5,16 +5,17 @@ import platform
 import time
 from os import system
 
-
 HUMAN = -1
 COMP = +1
 board = [
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
+    [0, 0, 0],
 ]
 
 MINIMAX_LAUNCHES = 0
+
 
 def evaluate(state, potential_moves):
     """
@@ -23,9 +24,9 @@ def evaluate(state, potential_moves):
     :return: +1 if the computer wins; -1 if the human wins; 0 draw
     """
     if wins(state, COMP):
-        score = +10 - potential_moves * 1
+        score = +13 - potential_moves * 1
     elif wins(state, HUMAN):
-        score = -10 + potential_moves * 1
+        score = -13 + potential_moves * 1
     else:
         score = 0
 
@@ -46,13 +47,19 @@ def wins(state, player):
         [state[0][0], state[0][1], state[0][2]],
         [state[1][0], state[1][1], state[1][2]],
         [state[2][0], state[2][1], state[2][2]],
+        [state[3][0], state[3][1], state[3][2]],  # last row
 
         [state[0][0], state[1][0], state[2][0]],
+        [state[1][0], state[2][0], state[3][0]],
         [state[0][1], state[1][1], state[2][1]],
+        [state[1][1], state[2][1], state[3][1]],
         [state[0][2], state[1][2], state[2][2]],
+        [state[1][2], state[2][2], state[3][2]],
 
         [state[0][0], state[1][1], state[2][2]],
         [state[2][0], state[1][1], state[0][2]],
+        [state[1][0], state[2][1], state[3][2]],
+        [state[3][0], state[2][1], state[1][2]],
     ]
     if [player, player, player] in win_state:
         return True
@@ -191,7 +198,7 @@ def render(state, c_choice, h_choice):
 
 def ai_turn(c_choice, h_choice):
     """
-    Вызывает функцию МинМакс если глубина < 9,
+    Вызывает функцию МинМакс если глубина < 12,
     Иначе выбирает случайно поле из возможных.
     :param c_choice: computer's choice X or O
     :param h_choice: human's choice X or O
@@ -205,13 +212,13 @@ def ai_turn(c_choice, h_choice):
     print(f'Ход алгоритма: [{c_choice}]')
     render(board, c_choice, h_choice)
 
-    if potential_moves > 9:
-        x = choice([0, 1, 2])
+    if potential_moves > 12:
+        x = choice([0, 1, 2, 3])
         y = choice([0, 1, 2])
     else:
-        move = minimax(board, potential_moves, COMP, 0, float(-infinity),  float(+infinity))
+        move = minimax(board, potential_moves, COMP, 0, float(-infinity), float(+infinity))
         x, y = move[0], move[1]
-
+    print(x, y)
     set_move(x, y, COMP)
     time.sleep(1)
 
@@ -233,15 +240,16 @@ def human_turn(c_choice, h_choice):
         1: [0, 0], 2: [0, 1], 3: [0, 2],
         4: [1, 0], 5: [1, 1], 6: [1, 2],
         7: [2, 0], 8: [2, 1], 9: [2, 2],
+        10: [3, 0], 11: [3, 1], 12: [3, 2],
     }
 
     clean()
     print(f'Ваш ход :[{h_choice}]')
     render(board, c_choice, h_choice)
 
-    while move < 1 or move > 9:
+    while move < 1 or move > 12:
         try:
-            move = int(input('Число из (1..9): '))
+            move = int(input('Число из (1..12): '))
             coord = moves[move]
             can_move = set_move(coord[0], coord[1], HUMAN)
 
@@ -302,7 +310,6 @@ def main():
 
         ai_turn(c_choice, h_choice)
 
-
     # Game over message
     if wins(board, HUMAN):
         clean()
@@ -318,7 +325,7 @@ def main():
         clean()
         render(board, c_choice, h_choice)
         print('НИЧЬЯ!')
-    print('Запуск функции МинМакс :',MINIMAX_LAUNCHES)
+    print(MINIMAX_LAUNCHES)
     exit()
 
 

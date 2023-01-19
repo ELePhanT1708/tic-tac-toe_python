@@ -16,20 +16,20 @@ board = [
 MINIMAX_LAUNCHES = 0
 
 
-def evaluate(state, potential_moves):
+def evaluate(state, depth):
     """
     Function to heuristic evaluation of state.
     :param state: the state of the current board
     :return: +1 if the computer wins; -1 if the human wins; 0 draw
     """
     if wins(state, COMP):
-        score = +10 - potential_moves * 1
+        score = +10 - depth * 1
     elif wins(state, HUMAN):
-        score = -10 + potential_moves * 1
+        score = -10 + depth * 1
     else:
         score = 0
 
-    return score
+    return score ##
 
 
 def wins(state, player):
@@ -198,7 +198,7 @@ def ai_turn(c_choice, h_choice):
     print(f'Ход алгоритма: [{c_choice}]')
     render(board, c_choice, h_choice)
 
-    if potential_moves == 9:
+    if potential_moves > 9:
         x = choice([0, 1, 2])
         y = choice([0, 1, 2])
     else:

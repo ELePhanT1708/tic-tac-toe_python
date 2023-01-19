@@ -24,9 +24,9 @@ def evaluate(state, potential_moves):
     :return: +1 if the computer wins; -1 if the human wins; 0 draw
     """
     if wins(state, COMP):
-        score = +10 - potential_moves * 1
+        score = +13 - potential_moves * 1
     elif wins(state, HUMAN):
-        score = -10 + potential_moves * 1
+        score = -13 + potential_moves * 1
     else:
         score = 0
 
@@ -119,7 +119,7 @@ def set_move(x, y, player):
         return False
 
 
-def minimax(state, potential_moves, player, depth, alpha, beta):
+def minimax(state, potential_moves, player, depth):
     """
     AI function that choice the best move
     :param state: current state of the board
@@ -142,7 +142,7 @@ def minimax(state, potential_moves, player, depth, alpha, beta):
     for cell in empty_cells(state):
         x, y = cell[0], cell[1]
         state[x][y] = player
-        score = minimax(state, potential_moves - 1, -player, depth + 1, alpha, beta)
+        score = minimax(state, potential_moves - 1, -player, depth + 1)
         print(score[2])
         state[x][y] = 0
         score[0], score[1] = x, y
@@ -150,17 +150,17 @@ def minimax(state, potential_moves, player, depth, alpha, beta):
         if player == COMP:
             if score[2] > best[2]:
                 best = score  # max value
-            if score[2] >= beta:
-                return best
-            if score[2] > alpha:
-                alpha = score[2]
+            # if score[2] >= beta:
+            #     return best
+            # if score[2] > alpha:
+            #     alpha = score[2]
         else:
             if score[2] < best[2]:
                 best = score  # min value
-            if score[2] <= alpha:
-                return best
-            if score[2] > beta:
-                beta = score[2]
+            # if score[2] <= alpha:
+            #     return best
+            # if score[2] > beta:
+            #     beta = score[2]
     return best
 
 
@@ -212,13 +212,13 @@ def ai_turn(c_choice, h_choice):
     print(f'Ход алгоритма: [{c_choice}]')
     render(board, c_choice, h_choice)
 
-    if potential_moves >= 12:
-        x = choice([0, 1, 2])
-        y = choice([0, 1, 2, 3])
+    if potential_moves > 12:
+        x = choice([0, 1, 2, 3])
+        y = choice([0, 1, 2])
     else:
-        move = minimax(board, potential_moves, COMP, 0, float(-infinity), float(+infinity))
+        move = minimax(board, potential_moves, COMP, 0)
         x, y = move[0], move[1]
-
+    print(x, y)
     set_move(x, y, COMP)
     time.sleep(1)
 

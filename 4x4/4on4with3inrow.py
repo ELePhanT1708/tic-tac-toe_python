@@ -6,26 +6,28 @@ import time
 from os import system
 
 
+MINIMAX_LAUNCHES = 0
+
 HUMAN = -1
 COMP = +1
 board = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
 ]
 
-MINIMAX_LAUNCHES = 0
 
-def evaluate(state, potential_moves):
+def evaluate(state, depth):
     """
     Function to heuristic evaluation of state.
     :param state: the state of the current board
     :return: +1 if the computer wins; -1 if the human wins; 0 draw
     """
     if wins(state, COMP):
-        score = +10 - potential_moves * 1
+        score = +20 - depth
     elif wins(state, HUMAN):
-        score = -10 + potential_moves * 1
+        score = -20 + depth
     else:
         score = 0
 
@@ -35,9 +37,9 @@ def evaluate(state, potential_moves):
 def wins(state, player):
     """
     This function tests if a specific player wins. Possibilities:
-    * Three rows    [X X X] or [O O O]
-    * Three cols    [X X X] or [O O O]
-    * Two diagonals [X X X] or [O O O]
+    * Four rows    [X X X X] or [O O O O]
+    * Four cols    [X X X X] or [O O O O]
+    * Two diagonals [X X X X] or [O O O O]
     :param state: the state of the current board
     :param player: a human or a computer
     :return: True if the player wins
@@ -52,7 +54,33 @@ def wins(state, player):
         [state[0][2], state[1][2], state[2][2]],
 
         [state[0][0], state[1][1], state[2][2]],
-        [state[2][0], state[1][1], state[0][2]],
+        [state[2][0], state[1][1], state[0][2]],  #hight left quarter
+
+        [state[0][1], state[0][2], state[0][3]],
+        [state[1][1], state[1][2], state[1][3]],
+        [state[2][1], state[2][2], state[2][3]],  #horizontal
+
+        [state[0][3], state[1][3], state[2][3]],  #vertical
+
+        [state[0][1], state[1][2], state[2][3]],
+        [state[0][3], state[1][2], state[2][1]],  # high right quarter
+
+
+        [state[3][0], state[3][1], state[3][2]],  #horizontal
+
+        [state[1][0], state[2][0], state[3][0]],
+        [state[1][1], state[2][1], state[3][1]],
+        [state[1][2], state[2][2], state[3][2]],  #vertical
+
+        [state[1][0], state[2][1], state[3][2]],
+        [state[1][2], state[2][1], state[3][0]],  # low left quarter
+
+        [state[3][1], state[3][2], state[3][3]],  # horizontal
+
+        [state[1][3], state[2][3], state[3][3]],  # vertical
+
+        [state[1][1], state[2][2], state[3][3]],
+        [state[1][3], state[2][2], state[3][1]],  # low right quarter
     ]
     if [player, player, player] in win_state:
         return True
@@ -205,11 +233,11 @@ def ai_turn(c_choice, h_choice):
     print(f'Ход алгоритма: [{c_choice}]')
     render(board, c_choice, h_choice)
 
-    if potential_moves > 9:
-        x = choice([0, 1, 2])
-        y = choice([0, 1, 2])
+    if potential_moves > 14:
+        x = choice([0, 1, 2, 3])
+        y = choice([0, 1, 2, 3])
     else:
-        move = minimax(board, potential_moves, COMP, 0, float(-infinity),  float(+infinity))
+        move = minimax(board, potential_moves, COMP, 0, float(-infinity), float(+infinity))
         x, y = move[0], move[1]
 
     set_move(x, y, COMP)
@@ -230,18 +258,19 @@ def human_turn(c_choice, h_choice):
     # Dictionary of valid moves
     move = -1
     moves = {
-        1: [0, 0], 2: [0, 1], 3: [0, 2],
-        4: [1, 0], 5: [1, 1], 6: [1, 2],
-        7: [2, 0], 8: [2, 1], 9: [2, 2],
+        1: [0, 0], 2: [0, 1], 3: [0, 2], 4: [0, 3],
+        5: [1, 0], 6: [1, 1], 7: [1, 2], 8: [1, 3],
+        9: [2, 0], 10: [2, 1], 11: [2, 2], 12: [2, 3],
+        13: [3, 0], 14: [3, 1], 15: [3, 2], 16: [3, 3],
     }
 
     clean()
     print(f'Ваш ход :[{h_choice}]')
     render(board, c_choice, h_choice)
 
-    while move < 1 or move > 9:
+    while move < 1 or move > 16:
         try:
-            move = int(input('Число из (1..9): '))
+            move = int(input('Число из (1..16): '))
             coord = moves[move]
             can_move = set_move(coord[0], coord[1], HUMAN)
 
@@ -297,11 +326,9 @@ def main():
         if first == 'N':
             ai_turn(c_choice, h_choice)
             first = ''
-        # ai_turn(h_choice, c_choice)
+
         human_turn(c_choice, h_choice)
-
         ai_turn(c_choice, h_choice)
-
 
     # Game over message
     if wins(board, HUMAN):
@@ -318,7 +345,7 @@ def main():
         clean()
         render(board, c_choice, h_choice)
         print('НИЧЬЯ!')
-    print('Запуск функции МинМакс :',MINIMAX_LAUNCHES)
+    print(MINIMAX_LAUNCHES)
     exit()
 
 
